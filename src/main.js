@@ -1,7 +1,7 @@
 import Replicate from 'replicate';
 import { getStaticFile, throwIfMissing } from './utils.js';
 
-export default async ({ req, res, error }) => {
+export default async ({ req, res, log, error }) => {
   throwIfMissing(process.env, ['REPLICATE_API_TOKEN']);
 
   if (req.method === 'GET') {
@@ -77,7 +77,7 @@ export default async ({ req, res, error }) => {
 
   if (req.body.type === 'image') {
     response = response[0];
-    console.log(response[0])
+    log(response[0])
   } else if (req.body.type === 'text') {
     response = response.join('');
   }
