@@ -37,8 +37,8 @@ module.exports = async function (req, res) {
       { input }
     );
 
-    log(output);
-    
+    context.log(output);
+
     res.json({
       success: true,
       image: output
