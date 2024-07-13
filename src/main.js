@@ -77,7 +77,7 @@ export default async ({ req, res, error }) => {
 
   if (req.body.type === 'image') {
     response = response[0];
-    context.log(response[0])
+    console.log(response[0])
   } else if (req.body.type === 'text') {
     response = response.join('');
   }
