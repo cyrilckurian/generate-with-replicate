@@ -36,6 +36,9 @@ module.exports = async function (req, res) {
       "konieshadow/fooocus-api:fda927242b1db6affa1ece4f54c37f19b964666bf23b0d06ae2439067cd344a4",
       { input }
     );
+
+    log(output);
+    
     res.json({
       success: true,
       image: output
