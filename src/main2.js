@@ -124,6 +124,9 @@ export default async ({ req, res, log, error }) => {
       response = { fileId: file.$id, documentId: document.$id };
     } catch (err) {
       error('Error processing image:', err);
+
+      // Detailed error logging
+      log('Error details:', err.response ? err.response.data : err.message);
       return res.json({ ok: false, error: 'Failed to process image' }, 500);
     }
   }
