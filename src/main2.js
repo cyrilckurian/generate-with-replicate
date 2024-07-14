@@ -98,22 +98,34 @@ export default async ({ req, res, log, error }) => {
 
       // Upload the image to Appwrite storage
       log('Uploading image to Appwrite storage');
-      const file = await storage.createFile(
-        process.env.APPWRITE_BUCKET_ID, // Replace with your storage bucket ID
-        'unique()', // Unique file ID
-        fs.createReadStream(path)
-      );
+      let file;
+      try {
+        file = await storage.createFile(
+          process.env.APPWRITE_BUCKET_ID, // Replace with your storage bucket ID
+          'unique()', // Unique file ID
+          fs.createReadStream(path)
+        );
+      } catch (uploadError) {
+        error('Error uploading to Appwrite storage:', uploadError);
+        return res.json({ ok: false, error: 'Failed to upload image to storage' }, 500);
+      }
 
       log('Image uploaded to Appwrite storage with file ID:', file.$id);
 
       // Save the file ID in the database
       log('Saving file ID to Appwrite database');
-      const document = await databases.createDocument(
-        process.env.APPWRITE_DATABASE_ID, // Replace with your database ID
-        process.env.APPWRITE_COLLECTION_ID, // Replace with your collection ID
-        'unique()', // Unique document ID
-        { fileId: file.$id, prompt: req.body.prompt }
-      );
+      let document;
+      try {
+        document = await databases.createDocument(
+          process.env.APPWRITE_DATABASE_ID, // Replace with your database ID
+          process.env.APPWRITE_COLLECTION_ID, // Replace with your collection ID
+          'unique()', // Unique document ID
+          { fileId: file.$id, prompt: req.body.prompt }
+        );
+      } catch (dbError) {
+        error('Error saving to Appwrite database:', dbError);
+        return res.json({ ok: false, error: 'Failed to save file ID to database' }, 500);
+      }
 
       log('File ID saved to database with document ID:', document.$id);
 
