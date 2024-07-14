@@ -25,7 +25,7 @@ export default async ({ req, res, log, error }) => {
   log('Received request:', req.body);
 
   const models = {
-    image: 'konieshadow/fooocus-api:fda927242b1db6affa1ece4f54c37f19b964666bf23b0d06ae2439067cd344a4',
+    image: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
   };
 
   if (!req.body.prompt || typeof req.body.prompt !== 'string') {
@@ -63,4 +63,87 @@ export default async ({ req, res, log, error }) => {
     return res.json({ ok: false, error: 'Failed to run model' }, 500);
   }
 
+
+  const client = new Client()
+    .setEndpoint(process.env.APPWRITE_ENDPOINT)
+    .setProject(process.env.APPWRITE_PROJECT_ID)
+    //.setKey(process.env.APPWRITE_API_KEY);
+
+  const storage = new Storage(client);
+  const databases = new Databases(client);
+
+  if (req.body.type === 'image') {
+    const imageUrl = response[0];
+    log('Image URL:', imageUrl);
+
+    try {
+      // Download the image
+      log('Downloading image from URL:', imageUrl);
+      const imageResponse = await axios({
+        url: imageUrl,
+        responseType: 'stream',
+      });
+
+      const path = `/tmp/image.jpg`; // Save the image temporarily
+      log('Saving image temporarily at:', path);
+
+      const writer = fs.createWriteStream(path);
+      imageResponse.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+
+      log('Image downloaded successfully');
+
+      // Upload the image to Appwrite storage
+      log('Uploading image to Appwrite storage');
+      let file;
+      try {
+        file = await storage.createFile(
+          process.env.APPWRITE_BUCKET_ID, // Replace with your storage bucket ID
+          'unique()', // Unique file ID
+          fs.createReadStream(path)
+        );
+      } catch (uploadError) {
+        error('Error uploading to Appwrite storage:', uploadError);
+        return res.json({ ok: false, error: 'Failed to upload image to storage' }, 500);
+      }
+
+      log('Image uploaded to Appwrite storage with file ID:', file.$id);
+
+      // Save the file ID in the database
+      log('Saving file ID to Appwrite database');
+      let document;
+      try {
+        document = await databases.createDocument(
+          process.env.APPWRITE_DATABASE_ID, // Replace with your database ID
+          process.env.APPWRITE_COLLECTION_ID, // Replace with your collection ID
+          'unique()', // Unique document ID
+          { fileId: file.$id, prompt: req.body.prompt }
+        );
+      } catch (dbError) {
+        error('Error saving to Appwrite database:', dbError);
+        return res.json({ ok: false, error: 'Failed to save file ID to database' }, 500);
+      }
+
+      log('File ID saved to database with document ID:', document.$id);
+
+      // Cleanup: Delete the temporary file
+      fs.unlinkSync(path);
+      log('Temporary image file deleted');
+
+      response = { fileId: file.$id, documentId: document.$id };
+    } catch (err) {
+      error('Error processing image:', err);
+
+      // Detailed error logging
+      log('Error details:', err.response ? err.response.data : err.message);
+      return res.json({ ok: false, error: 'Failed to process image' }, 500);
+    }
+  }
+
+  log('Final response:', response);
+  return res.json({ ok: true, response, type: req.body.type }, 200);
 };
