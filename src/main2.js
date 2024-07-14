@@ -25,7 +25,7 @@ export default async ({ req, res, log, error }) => {
   log('Received request:', req.body);
 
   const models = {
-    image: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
+    image: 'konieshadow/fooocus-api:fda927242b1db6affa1ece4f54c37f19b964666bf23b0d06ae2439067cd344a4',
   };
 
   if (!req.body.prompt || typeof req.body.prompt !== 'string') {
