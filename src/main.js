@@ -1,7 +1,7 @@
 import Replicate from 'replicate';
 import { getStaticFile, throwIfMissing } from './utils.js';
 
-export default async ({ req, res, error }) => {
+export default async ({ req, res, log, error }) => {
   throwIfMissing(process.env, ['REPLICATE_API_TOKEN']);
 
   if (req.method === 'GET') {
@@ -15,7 +15,8 @@ export default async ({ req, res, error }) => {
       'meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38',
     text: 'meta/llama-2-70b-chat',
     image:
-      'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
+      // 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
+      'konieshadow/fooocus-api:fda927242b1db6affa1ece4f54c37f19b964666bf23b0d06ae2439067cd344a4',
   };
 
   if (!req.body.prompt || typeof req.body.prompt !== 'string') {
@@ -77,9 +78,10 @@ export default async ({ req, res, error }) => {
 
   if (req.body.type === 'image') {
     response = response[0];
+    
   } else if (req.body.type === 'text') {
     response = response.join('');
   }
-
+  log(response)
   return res.json({ ok: true, response, type: req.body.type }, 200);
 };
