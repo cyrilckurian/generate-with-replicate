@@ -1,35 +1,56 @@
-# ⚡ Node.js Starter Function
+# 🤖 Generate with Replicate
 
-A simple starter function. Edit `src/main.js` to get started and create something awesome! 🚀
+Generate text, audio and images using Replicate's API.
 
 ## 🧰 Usage
 
 ### GET /
 
-- Returns a "Hello, World!" message.
+HTML form for interacting with the function.
 
-**Response**
+### POST /
 
-Sample `200` Response:
+Query the model for a completion.
 
-```text
-Hello, World!
-```
+**Parameters**
 
-### POST, PUT, PATCH, DELETE /
-
-- Returns a "Learn More" JSON response.
-
-**Response**
+| Name         | Description                                                           | Location | Type               | Sample Value                  |
+| ------------ | --------------------------------------------------------------------- | -------- | ------------------ | ----------------------------- |
+| Content-Type | The content type of the request body                                  | Header   | `application/json` | N/A                           |
+| prompt       | Text to prompt the model                                              | Body     | String             | `Write a haiku about Mondays` |
+| type         | The type of completion to generate, can be `text`, `audio` or `image` | Body     | String             | `text`                        |
 
 Sample `200` Response:
+
+Response from the model.
 
 ```json
 {
-  "motto": "Build like a team of hundreds_",
-  "learn": "https://appwrite.io/docs",
-  "connect": "https://appwrite.io/discord",
-  "getInspired": "https://builtwith.appwrite.io"
+  "ok": true,
+  "completion": "Monday's heavy weight, Dawning with a sigh of grey, Hopeful hearts await.",
+  "type": "text"
+}
+```
+
+Sample `400` Response:
+
+Response when the request body is missing.
+
+```json
+{
+  "ok": false,
+  "error": "Missing body with a prompt."
+}
+```
+
+Sample `500` Response:
+
+Response when the model fails to respond.
+
+```json
+{
+  "ok": false,
+  "error": "Failed to query model."
 }
 ```
 
@@ -41,8 +62,16 @@ Sample `200` Response:
 | Entrypoint        | `src/main.js` |
 | Build Commands    | `npm install` |
 | Permissions       | `any`         |
-| Timeout (Seconds) | 15            |
+| Timeout (Seconds) | 900           |
 
 ## 🔒 Environment Variables
 
-No environment variables required.
+### REPLICATE_API_KEY
+
+A unique key used to authenticate with the Replicate API. Please note that this is a paid service and you will be charged for each request made to the API. For more information, see the [Replicate AI pricing page](https://replicate.com/pricing).
+
+| Question      | Answer                                                          |
+| ------------- | --------------------------------------------------------------- |
+| Required      | Yes                                                             |
+| Sample Value  | `r8_......`                                                     |
+| Documentation | [Replicate Docs](https://replicate.com/docs/get-started/nodejs) |
