@@ -77,7 +77,7 @@ export default async ({ req, res, log, error }) => {
 
     try {
       // Download the image
-      log('Downloading image from URL');
+      log('Downloading image from URL:', imageUrl);
       const imageResponse = await axios({
         url: imageUrl,
         responseType: 'stream',
@@ -128,6 +128,6 @@ export default async ({ req, res, log, error }) => {
     }
   }
 
-  log('Response:', response);
+  log('Final response:', response);
   return res.json({ ok: true, response, type: req.body.type }, 200);
 };
