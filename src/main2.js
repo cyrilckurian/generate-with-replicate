@@ -5,7 +5,15 @@ import { Client, Storage, Databases } from 'node-appwrite';
 import { getStaticFile, throwIfMissing } from './utils.js';
 
 export default async ({ req, res, log, error }) => {
-  
+  throwIfMissing(process.env, [
+    'REPLICATE_API_TOKEN',
+    'APPWRITE_ENDPOINT',
+    'APPWRITE_PROJECT_ID',
+    'APPWRITE_API_KEY',
+    'APPWRITE_BUCKET_ID',
+    'APPWRITE_DATABASE_ID',
+    'APPWRITE_COLLECTION_ID'
+  ]);
 
   if (req.method === 'GET') {
     log('GET request received, serving static file');
