@@ -90,7 +90,7 @@ export default async ({ req, res, log, error }) => {
     return res.json({ ok: false, error: 'Failed to run model' }, 500);
   }
 
-  log(response);
+  log(prediction);
 
   // Return the complete output object
   return res.json({ ok: true, response: prediction, type: req.body.type }, 200);
