@@ -25,15 +25,15 @@ async function fetchImageToBase64(url) {
 // Function to save Base64 string to Appwrite database
 async function saveBase64ToAppwrite(base64String) {
   const client = new Client()
-    .setEndpoint("https://cloud.appwrite.io/v1") // Your Appwrite endpoint
-    .setProject("66929dbd0013cec79a52"); // Your Appwrite project ID
+    .setEndpoint(process.env.APPWRITE_ENDPOINT) // Your Appwrite endpoint
+    .setProject(process.env.APPWRITE_PROJECT_ID); // Your Appwrite project ID
 
   const databases = new Databases(client);
 
   try {
     const response = await databases.createDocument(
-      '6692ae920034da90635c', // Your database ID
-      '6692ae9d00274a094c1d', // Your collection ID
+      process.env.APPWRITE_DATABASE_ID, // Your database ID
+      process.env.APPWRITE_COLLECTION_ID, // Your collection ID
       ID.unique(), // Generate a unique document ID
       { image: base64String } // Document data
     );
